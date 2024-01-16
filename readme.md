@@ -98,7 +98,7 @@ yarn keygen
 
 This will generate a new Keypair, outputting its Address and Private Key like so:
 ```
-You've generated a new Solana wallet: 0xf4a202b4883cb5b86a7b3a1573695019b646f86115ffdca623c98b99140c10fc
+You've generated a new Sui wallet: 0xf4a202b4883cb5b86a7b3a1573695019b646f86115ffdca623c98b99140c10fc
 
 To save your wallet, copy and paste your private key into a JSON file:
 
@@ -235,13 +235,9 @@ To send all of the remaining mist out of our dev wallet to our WBA wallet, we sh
 ```
 
 You can see from the outputted transaction block on the SUI explorer that the entire object was transfered.
-```
-Check out your TX here:
-https://explorer.solana.com/tx/4dy53oKUeh7QXr15wpKex6yXfz4xD2hMtJGdqgzvNnYyDNBZXtcgKZ7NBvCj7PCYU1ELfPZz3HEk6TzT4VQmNoS5?cluster=devnet
-```
 
 ## 5. Submit your completion of the WBA pre-requisites program
-When you first signed up for the course, you gave WBA a Solana address for certification and your Github account. Your challenge now is to use the devnet tokens you just airdropped and transferred to yourself to confirm your enrollment in the course on the Sui devnet.
+When you first signed up for the course, you gave WBA a Sui address for certification and your Github account. Your challenge now is to use the devnet tokens you just airdropped and transferred to yourself to confirm your enrollment in the course on the Sui devnet.
 
 In order to do this, we're going to have to quickly familiarise ourselves with two key concepts of Sui:
 
