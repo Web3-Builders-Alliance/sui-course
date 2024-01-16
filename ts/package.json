@@ -4,12 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "keygen": "ts-node ./prereq/keygen.ts",
-    "airdrop": "ts-node ./prereq/airdrop.ts",
-    "transfer": "ts-node ./prereq/transfer.ts",
-    "transfer_all": "ts-node ./prereq/transfer_all.ts",
-    "publish": "ts-node ./prereq/publish.ts",
-    "enroll": "ts-node ./prereq/enroll.ts",
+    "keygen": "ts-node ./prereqs/keygen.ts",
+    "airdrop": "ts-node ./prereqs/airdrop.ts",
+    "transfer": "ts-node ./prereqs/transfer.ts",
+    "transfer_all": "ts-node ./prereqss/transfer_all.ts",
+    "publish": "ts-node ./publish.ts",
+    "enroll": "ts-node ./prereqs/enroll.ts",
     "instructor": "ts-node ./prereq/instructor.ts"
   },
   "dependencies": {

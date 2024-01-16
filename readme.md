@@ -38,7 +38,7 @@ touch enroll.ts
 yarn tsc --init --rootDir ./ --outDir ./dist --esModuleInterop --lib ES2019 --module commonjs --resolveJsonModule true --noImplicitAny true
 ```
 
-Finally, we're going to create some scripts in our `package.json` file to let us run the three scripts we're going to build today:
+Finally, we're going to add some scripts in our `package.json` file to let us run the four scripts we're going to build today:
 
 ```js
 {
@@ -78,13 +78,16 @@ import { fromB64 } from "@mysten/sui.js/utils";
 Now we're going to create a new Keypair, like so:
 
 ```ts
-//Generate a new keypair
-let kp = Ed25519Keypair.generate()
+let kp = Ed25519Keypair.generate();
 console.log(`You've generated a new Sui wallet: ${kp.toSuiAddress()}
 
 To save your wallet, copy and paste the following into a JSON file:
 
-[${kp.export().privateKey}]`)
+[${fromB64(kp.export().privateKey)}]\n
+
+You can use the below HEX to import the key into a web wallet:
+
+${toHEX(fromB64(kp.export().privateKey))}\n`);
 ```
 
 Now we can run the following script in our terminal to generate a new keypair!
@@ -115,39 +118,8 @@ This creates the file `dev-wallet.json` in our `./prereq` root directory. Now we
 
 Congrats, you've created a new Keypair and saved your wallet. Let's go claim some tokens!
 
-### NOT DONE
-### 1.3 Import/Export to Phantom
-Solana wallet files and wallets like Phantom use different encoding. While Solana wallet files use a byte array, Phantom uses a base58 encoded string representation of private keys. If you would like to go between these formats, try import the `bs58` package. We'll also use the `prompt-sync` package to take in the private key: 
-
-```sh
-yarn add bs58 prompt-sync
-```
-
-```ts
-import bs58 from 'bs58'
-import * as prompt from 'prompt-sync
-```
-
-Now add in the following two convenience functions to your tests and you should have a simple CLI tool to convert between wallet formats:
-
-```ts
-#[test]
-fn base58_to_wallet() {
-    println!("Enter your name:");
-    let stdin = io::stdin();
-    let base58 = stdin.lock().lines().next().unwrap().unwrap(); // gdtKSTXYULQNx87fdD3YgXkzVeyFeqwtxHm6WdEb5a9YJRnHse7GQr7t5pbepsyvUCk7VvksUGhPt4SZ8JHVSkt
-    let wallet = bs58::decode(base58).into_vec().unwrap();
-    println!("{:?}", wallet);
-}
-
-#[test]
-fn wallet_to_base58() {
-    let wallet: Vec<u8> = vec![34,46,55,124,141,190,24,204,134,91,70,184,161,181,44,122,15,172,63,62,153,150,99,255,202,89,105,77,41,89,253,130,27,195,134,14,66,75,242,7,132,234,160,203,109,195,116,251,144,44,28,56,231,114,50,131,185,168,138,61,35,98,78,53];
-    let base58 = bs58::encode(wallet).into_string();
-    println!("{:?}", base58);
-}
-```
-
+### 1.3 Import/Export to Suiet(or another wallet.)
+Sui wallet files and wallets like Suiet use different encoding. While the Sui SDK can use multiple encodings like a byte array, base64, and Hex, Suiet uses a Hex encoded string representation of private keys. 
 
 ## 2. Claim Token Airdrop
 Now that we have our wallet created, we're going to import it int './airdrop.ts'.
@@ -269,72 +241,33 @@ https://explorer.solana.com/tx/4dy53oKUeh7QXr15wpKex6yXfz4xD2hMtJGdqgzvNnYyDNBZX
 ```
 
 ## 5. Submit your completion of the WBA pre-requisites program
-When you first signed up for the course, you gave WBA a Solana address for certification and your Github account. Your challenge now is to use the devnet tokens you just airdropped and transferred to yourself to confirm your enrollment in the course on the Solana devnet.
+When you first signed up for the course, you gave WBA a Solana address for certification and your Github account. Your challenge now is to use the devnet tokens you just airdropped and transferred to yourself to confirm your enrollment in the course on the Sui devnet.
 
-In order to do this, we're going to have to quickly familiarise ourselves with two key concepts of Solana:
+In order to do this, we're going to have to quickly familiarise ourselves with two key concepts of Sui:
 
-1. **PDA (Program Derived Address)** - A PDA is used to enable our program to "sign" transactions with a Public Key derived from some kind of deterministic seed. This is then combined with an additional "bump" which is a single additional byte that is generated to "bump" this Public Key off the elliptic curve. This means that there is no matching Private Key for this Public Key, as if there were a matching private key and someone happened to possess it, they would be able to sign on behalf of the program, creating security concerns.
+1. **PTB (Programable Transaction Blocks)** - A PTB allows us to create complex and atomic transactions that touch multiple objects, types, functions, etc... There will be many use cases where you can use a PTB instead of putting a module on chain!
 
-2. **IDL (Interface Definition Language)** - Similar to the concept of ABI in other ecosystems, an IDL specifies a program's public interface. Though not mandatory, most programs on Solana do have an IDL, and it is the primary way we typically interact with programs on Solana. It defines a Solana program's account structures, instructions, and error codes. IDLs are .json files, so they can be used to generate client-side code, such as Typescript type definitions, for ease of use.
+1. **Move Calls** - Move calls allow you to interact with a modules entry functions, you can use the block explorer to quickly play with modules on chain, but in this example we will use the Sui TS Sdk.
 
 Let's dive into it!
 
-#### 5.1 Consuming an IDL in Typescript
-For the purposes of this class, we have published a WBA pre-requisite course program to the Solana Devnet with a public IDL that you can use to provide onchain proof that you've made it to the end of our pre-requisite coursework. 
+#### 5.1 Looking at the Explorer to 
+For the purposes of this class, we have published a WBA pre-requisite course program to the Sui Devnet.
 
-You can find our program on Devnet by this address: [HC2oqz2p6DEWfrahenqdq2moUcga9c9biqRBcdK3XKU1](https://explorer.solana.com/address/HC2oqz2p6DEWfrahenqdq2moUcga9c9biqRBcdK3XKU1?cluster=devnet)
+You can find our enrollment module on Devnet by this address: [0x8a01cf24865096d16381f085707026a924c63f18ea39f14dec772b363818a1f7](https://suiexplorer.com/object/0x8a01cf24865096d16381f085707026a924c63f18ea39f14dec772b363818a1f7?module=enrollment&network=devnet)
 
-If we explore the devnet explorer, there is a tab called "[Anchor Program IDL](https://explorer.solana.com/address/HC2oqz2p6DEWfrahenqdq2moUcga9c9biqRBcdK3XKU1/anchor-program?cluster=devnet)" which reveals the IDL of our program. If you click the clipboard icon at the top level of this JSON object, you can copy the IDL directly from the browser. The result should look something like this:
+If we explore the devnet explorer, there is a section called "[Execute] which gives us a easy way to interact with a module, instead of using that lets do it in typescript instead.
 
-```json
-{
-  "version": "0.1.0",
-  "name": "wba_prereq",
-  "instructions": [
-    {
-      "name": "complete",
-      ...
-    }
-  ]
-}
-```
-
-As you can see, this defines the schema of our program with a single instruction called `complete` that takes in 1 argument:
-1. `github` - a byte representation of the utf8 string of your github account name
-
-As well as 3 accounts:
-1. `signer` - your public key you use to sign up for the WBA course
-2. `prereq` - an account we create in our program with a custom PDA seed (more on this later)
-3. `systemAccount` - the Solana system program which is used to execute account instructions
-
-In order for us to consume this in typescript, we're going to go and create a `type` and an `object` for it. Let's start by creating a folder in our root directory called `programs` so we can easily add additional program IDLs in the future, along with a new typescript file called `wba_prereq.ts`.
-
-```sh
-mkdir programs
-touch ./programs/wba_prereq.ts
-```
-
-Now that we've created the `wba_prereq.ts` file, we're going to open it up and create our `type` and `object`.
-
-```ts
-export type WbaPrereq =  = { "version": "0.1.0", "name": "wba_prereq", ...etc }
-export const IDL: WbaPrereq = { "version": "0.1.0", "name": "wba_prereq", ...etc }
-```
-
-Our `type` and `object` are now ready to import this into Typescript, but to actually consume it, first, we're going to need to install Anchor, a Solana development framework, as well as define a few other imports.
-
-Let's first install `@project-serum/anchor`:
-```sh
-yarn add @project-serum/anchor
-```
+We want you to call the enroll function and pass in a byte representation of the utf8 string of your github account name
 
 Now let's open up `enroll.ts` and define the following imports:
 
 ```ts
-import { Connection, Keypair, SystemProgram, PublicKey } from "@solana/web3.js"
-import { Program, Wallet, AnchorProvider, Address } from "@project-serum/anchor"
-import { WbaPrereq, IDL } from "./programs/wba_prereq";
-import wallet from "./wba-wallet.json"
+import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
+import { bcs} from "@mysten/sui.js/bcs";
+import { TransactionBlock } from '@mysten/sui.js/transactions';
+import wallet from "../wba-wallet.json"
 ```
 
 Note that we've imported a new wallet filed called `wba-wallet.json`. Unlike the dev-wallet.json, this should contain the private key for an account you might care about. To stop you from accidentally comitting your private key(s) to a git repo, consider adding a `.gitignore` file. Here's an example that will ignore all files that end in `wallet.json`:
@@ -343,72 +276,52 @@ Note that we've imported a new wallet filed called `wba-wallet.json`. Unlike the
 *wallet.json
 ```
 
-As with last time, we're going to create a keypair and a connection:
+As with last time, we're going to create a keypair and a client:
 ```ts
-// We're going to import our keypair from the wallet file
-const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
 
-// Create a devnet connection
-const connection = new Connection("https://api.devnet.solana.com");
+
+
+// We're going to import our keypair from the wallet file
+const keypair = Ed25519Keypair.fromSecretKey(new Uint8Array(wallet));
+
+// Create a devnet client
+const client = new SuiClient({ url: getFullnodeUrl("devnet") });
 ```
 
-To register ourselves as having completed pre-requisites, we need to submit our github account name as a utf8 buffer:
+
+
+To register ourselves as having completed pre-requisites, we need to create a PTB submit our github account name as a utf8 buffer:
+
+```ts
+const txb = new TransactionBlock(;
+```
+
+Next we will convert our github username into a byte array and then use BCS to serialize it. BCS is a serialization format that is compatable with Sui Move and the Sui TS SDK. 
+
 ```ts
 // Github account
-const github = Buffer.from("<your github account>", "utf8");
+const github = new Uint8Array(Buffer.from("-your github account-"));
+let serialized_github = txb.pure(bcs.vector(bcs.u8()).serialize(github));
 ```
 
-Now we're going to use our connection and wallet to create an Anchor provider:
-```ts
-// Create our anchor provider
-const provider = new AnchorProvider(connection, new Wallet(keypair), { commitment: "confirmed"});
-```
-
-Finally, we can use the Anchor `provider`, our IDL `object` and our IDL `type` to create our anchor `program`, allowing us to interact with the WBA prerequisite program.
-```ts
-// Create our program
-const program = new Program<WbaPrereq>(IDL, "HC2oqz2p6DEWfrahenqdq2moUcga9c9biqRBcdK3XKU1" as Address, provider);
-```
-
-#### 5.2 Creating a PDA
-Now we need to create a PDA for our `prereq` account. The seeds for this particular PDA are:
-
-1. A Utf8 `Buffer` of the `string`: "prereq"
-2. The `Buffer` of the public key of the transaction signer
-
-There are then combined into a single Buffer, along with the `program` ID, to create a deterministic address for this account. The `findProgramAddressSync` function is then going to combine this with a `bump` to find an address that is not on the elliptic curve and return the derived address, as well as the bump which we will not be using in this example:
+Now, we can create a Move Call and talk to the onchain module.
 
 ```ts
-// Create the PDA for our enrollment account
-const enrollment_seeds = [Buffer.from("prereq"), keypair.publicKey.toBuffer()];
-const [enrollment_key, _bump] = PublicKey.findProgramAddressSync(enrollment_seeds, program.programId);
+let enroll = txb.moveCall({
+    target: `${enrollment_object_id}::enrollment::enroll`,
+    arguments: [serialized_github, txb.object(cohort)],
+});
 ```
 
-Remember to familiarize yourself with this concept as you'll be using it often!
+The final setp is to have our client sign and execute our PTB.
+
+```ts
+let txid = await client.signAndExecuteTransactionBlock({ signer: keypair, transactionBlock: txb });
+console.log(`Success! Check our your TX here:
+https://suiexplorer.com/txblock/${txid.digest}?network=devnet`);
+```
 
 #### 5.3 Putting it all together
 Now that we have everything we need, it's finally time to put it all together and make a transaction interacting with the devnet program to submit our `github` account and our `publicKey` to signify our completion of the WBA pre-requisite materials!
 
-```ts
-// Execute our enrollment transaction
-(async () => {
-    try {
-        const txhash = await program.methods
-        .complete(github)
-        .accounts({
-            signer: keypair.publicKey,
-            prereq: enrollment_key,
-            systemProgram: SystemProgram.programId,
-        })
-        .signers([
-            keypair
-        ]).rpc();
-        console.log(`Success! Check out your TX here: 
-        https://explorer.solana.com/tx/${txhash}?cluster=devnet`);
-    } catch(e) {
-        console.error(`Oops, something went wrong: ${e}`)
-    }
-})();
-```
-
-Congratulations, you have completed the WBA Solana Q2 Pre-requisite coursework!
+Congratulations, you have enrolled and completed the WBA Sui Q1 Pre-requisite coursework!
