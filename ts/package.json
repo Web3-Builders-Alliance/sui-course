@@ -1,0 +1,23 @@
+{
+  "name": "prereq",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "keygen": "ts-node ./prereq/keygen.ts",
+    "airdrop": "ts-node ./prereq/airdrop.ts",
+    "transfer": "ts-node ./prereq/transfer.ts",
+    "transfer_all": "ts-node ./prereq/transfer_all.ts",
+    "publish": "ts-node ./prereq/publish.ts",
+    "enroll": "ts-node ./prereq/enroll.ts",
+    "instructor": "ts-node ./prereq/instructor.ts"
+  },
+  "dependencies": {
+    "@mysten/sui.js": "^0.49.0",
+    "@types/node": "^18.15.11",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
+  }
+}
