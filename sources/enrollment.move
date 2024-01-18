@@ -21,6 +21,7 @@ module cohort::enrollment {
 
     struct Cohort has key, store {
         id: UID,
+        name: String,
         cadets: table::Table<address, String>,
         open_for_enrollment: bool
     }
@@ -46,16 +47,17 @@ module cohort::enrollment {
         }, tx_context::sender(ctx))
     }
 
-    public entry fun add_instructor(_: &InstructorCap, recipient:address, ctx: &mut TxContext) {
+    public entry fun add_instructor(_: &InstructorCap, recipient: address, ctx: &mut TxContext) {
         transfer::transfer(InstructorCap {
             id: object::new(ctx)
         }, recipient)
     }
 
-    public entry fun create_cohort(_: &InstructorCap, ctx: &mut TxContext) {
+    public entry fun create_cohort(_: &InstructorCap, name: String, ctx: &mut TxContext) {
         transfer::share_object(
         Cohort {
             id: object::new(ctx),
+            name, 
             cadets: table::new(ctx),
             open_for_enrollment: false
         })
