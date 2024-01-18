@@ -49,7 +49,7 @@ module cohort::enrollment {
 
     #[lint_allow(self_transfer)]
     public entry fun enroll(cohort: &mut Cohort, github: vector<u8>, ctx: &mut TxContext) {
-        internal_enroll(&github, cohort, ctx);
+        internal_enroll(cohort, &github, ctx);
         let name = from_ascii(ascii::string(github));
         let cadet = Cadet {
              id: object::new(ctx),
@@ -83,11 +83,11 @@ module cohort::enrollment {
     }
 
     public fun open_for_enrollment(self: &Cohort): bool {
-        &self.open_for_enrollment
+        self.open_for_enrollment
     }  
 
     public fun name(self: &Cohort): String {
-        &self.name
+        self.name
     }        
 
     // === Admin ===
