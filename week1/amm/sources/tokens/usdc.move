@@ -1,4 +1,4 @@
-module week1::usdc {
+module amm::usdc {
   use std::option;
 
   use sui::transfer;

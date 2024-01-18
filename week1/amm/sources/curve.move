@@ -1,4 +1,4 @@
-module week1::curve {
+module amm::curve {
 
   use suitears::math256::div_down;
 

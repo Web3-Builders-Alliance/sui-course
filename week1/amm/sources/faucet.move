@@ -1,4 +1,4 @@
-module week1::faucet {
+module amm::faucet {
   use sui::transfer;
   use sui::object::{Self, UID};
   use sui::clock::{Self, Clock};
@@ -6,8 +6,8 @@ module week1::faucet {
   use sui::coin::{Self, TreasuryCap};
   use sui::tx_context::{Self, TxContext};
 
-  use week1::eth::ETH;
-  use week1::usdc::USDC;
+  use amm::eth::ETH;
+  use amm::usdc::USDC;
 
   const COOLDOWN: u64 = 300000; // 5 minutes
 

@@ -1,4 +1,4 @@
-module week1::admin {
+module amm::admin {
 
   use sui::transfer;
   use sui::object::{Self, UID};

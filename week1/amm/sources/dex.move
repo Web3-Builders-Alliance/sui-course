@@ -1,4 +1,4 @@
-module week1::dex {
+module amm::dex {
   use std::type_name::{Self, TypeName};
 
   use sui::transfer;
@@ -8,9 +8,9 @@ module week1::dex {
   use sui::tx_context::TxContext;
   use sui::balance::{Self, Balance};
 
-  use week1::curve;
-  use week1::utils;
-  use week1::admin::Admin;
+  use amm::curve;
+  use amm::utils;
+  use amm::admin::Admin;
 
   const EWrongOrder: u64 = 0;
   const ENoZeroSeedLiquidity: u64 = 1;

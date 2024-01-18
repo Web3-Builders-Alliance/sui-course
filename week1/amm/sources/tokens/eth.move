@@ -1,4 +1,4 @@
-module week1::eth {
+module amm::eth {
   use std::option;
 
   use sui::transfer;

@@ -1,4 +1,4 @@
-module week1::utils {
+module amm::utils {
   use std::type_name;
 
   use suitears::comparator;
