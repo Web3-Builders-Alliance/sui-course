@@ -62,7 +62,7 @@ sui client call --package <PACKAGE_ID> --module faucet --function mint_usdc --ar
 
 ## Swap USDC -> ETH
 
-The swap function returns an object, which requires handling. Please write use the TS SDK to handle it.
+The swap function returns an object, which requires handling. Please use the TS SDK to handle it.
 
 Below we will provide the signature of the Move call.
 
