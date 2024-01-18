@@ -62,19 +62,15 @@ sui client call --package <PACKAGE_ID> --module faucet --function mint_usdc --ar
 
 ## Swap USDC -> ETH
 
-The swap function returns an object, which requires handling. Please write a script to handle.
+The swap function returns an object, which requires handling. Please write use the TS SDK to handle it.
 
 Below we will provide the signature of the Move call.
-
-devenet. To complete this task we will need to split our SUI coin object.
 
 ```ts
 (async () => {
   try {
     //create Transaction Block.
     const txb = new TransactionBlock();
-
-    // TODO: Join all your coins into One
 
     // Call the DEX
     const coin_out = txb.moveCall({
