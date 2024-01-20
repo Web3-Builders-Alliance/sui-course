@@ -10,8 +10,7 @@ module cohort::enrollment {
     use std::{
         string::{String, from_ascii},
         ascii,
-        vector,
-        debug::print
+        vector
     };
 
     const EEnrollmentNotOpen:u64 = 0;
@@ -72,7 +71,6 @@ module cohort::enrollment {
         assert!(table::contains(&cohort.cadets, sender), ENotSignedUp);
         table::remove(&mut cohort.cadets, sender);
 
-        print(cohort);
         internal_enroll(cohort, &github, ctx)
     }
 
@@ -116,7 +114,7 @@ module cohort::enrollment {
         })
     }
 
-    public entry fun toggle_signups(cohort: &mut Cohort, _: &InstructorCap) {
+    public entry fun toggle_signups(_: &InstructorCap, cohort: &mut Cohort) {
        cohort.open_for_enrollment = !cohort.open_for_enrollment
     }    
 

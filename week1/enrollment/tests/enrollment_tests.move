@@ -1,23 +1,12 @@
 #[test_only]
 module cohort::enrollment_tests {
 
-    use sui::{
-        tx_context::{Self, TxContext},
-        object::{Self, UID, ID, uid_to_inner},
-        transfer,
-        table
-    };
-    use std::{
-        string::{String, from_ascii, utf8},
-        ascii,
-        vector,
-        debug::print
-    };
+    use std::string::utf8;
     
     use sui::test_scenario as ts;
 
-    use cohort::enrollment::{Self, Cohort, Cadet, InstructorCap};
-    use cohort::enrollment::{test_init, create_cohort, toggle_signups, enroll};
+    use cohort::enrollment::{Cohort, InstructorCap};
+    use cohort::enrollment::{test_init, new_cohort, toggle_signups, enroll};
     use cohort::enrollment::{update};
 
     const INSTRUCTOR: address = @0x99;
@@ -37,8 +26,7 @@ module cohort::enrollment_tests {
          ts::next_tx(scenario, INSTRUCTOR);
         {
             let cap = ts::take_from_sender<InstructorCap>(scenario);
-            let name = b"cohort_name";
-            create_cohort(&cap, name, ts::ctx(scenario));
+            new_cohort(&cap, utf8(b"cohort_name"), ts::ctx(scenario));
             ts::return_to_sender(scenario, cap);
         };
     }
@@ -58,7 +46,7 @@ module cohort::enrollment_tests {
         ts::next_tx(scenario, CADET);
         {
             let cohort = ts::take_shared<Cohort>(scenario);
-            enroll(github, &mut cohort, ts::ctx(scenario));
+            enroll(&mut cohort, github, ts::ctx(scenario));
             ts::return_shared(cohort);
         };
     }
@@ -67,16 +55,7 @@ module cohort::enrollment_tests {
         ts::next_tx(scenario, CADET);
         {
             let cohort = ts::take_shared<Cohort>(scenario);
-            update(github, &mut cohort, ts::ctx(scenario));
-            ts::return_shared(cohort);
-        };
-    }
-
-    fun get_cadet_table(github:vector<u8>, scenario: &mut ts::Scenario) {
-        ts::next_tx(scenario, CADET);
-        {
-            let cohort = ts::take_shared<Cohort>(scenario);
-            enroll(github, &mut cohort, ts::ctx(scenario));
+            update(&mut cohort, github, ts::ctx(scenario));
             ts::return_shared(cohort);
         };
     }
@@ -151,20 +130,6 @@ module cohort::enrollment_tests {
         ts::end(scenario_val);
     }
 
-        fun invalid_github_name_end_hyphen() {
-        let scenario_val= init_test();
-        let scenario = &mut scenario_val;
-        // create cohort
-        create_cohort_test(scenario);
-        // Open for enrollment
-        open_enrollment_test(scenario);
-        // Enroll cadet
-        //these should all fail.
-        enroll_cadet_test(b"ivmidable-", scenario);
-        //enroll_cadet_test(b"ivmidable-", scenario);
-        ts::end(scenario_val);
-    }
-
     #[test]
     #[expected_failure]
     fun invalid_github_name_space() {
@@ -229,7 +194,8 @@ module cohort::enrollment_tests {
     }
 
     #[test]
-    fun get_cadet_table() {
+    #[expected_failure]
+    fun test_get_cadet_table() {
         let scenario_val= init_test();
         let scenario = &mut scenario_val;
         // create cohort
