@@ -20,12 +20,12 @@ module amm::dex {
     id: UID,
   } 
 
-  struct LpCoin<phantom CoinX, phantom CoinY> {}
-
   struct State<phantom CoinX, phantom CoinY> has store {
     balance_x: Balance<CoinX>,
     balance_y: Balance<CoinY>
   }
+
+  struct LpCoin<phantom CoinX, phantom CoinY> {}
 
   #[lint_allow(share_owned)]
   public fun new<CoinX, CoinY>(

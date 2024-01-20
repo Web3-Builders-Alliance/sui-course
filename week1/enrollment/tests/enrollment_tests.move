@@ -37,7 +37,7 @@ module cohort::enrollment_tests {
          ts::next_tx(scenario, INSTRUCTOR);
         {
             let cap = ts::take_from_sender<InstructorCap>(scenario);
-            let name = "cohort_name";
+            let name = b"cohort_name";
             create_cohort(&cap, name, ts::ctx(scenario));
             ts::return_to_sender(scenario, cap);
         };

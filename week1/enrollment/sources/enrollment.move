@@ -88,7 +88,15 @@ module cohort::enrollment {
 
     public fun name(self: &Cohort): String {
         self.name
-    }        
+    }   
+
+    public fun github(self: &Cadet): String {
+        self.github
+    }
+
+    public fun cohort(self: &Cadet): ID {
+        self.cohort
+    }         
 
     // === Admin ===
 
