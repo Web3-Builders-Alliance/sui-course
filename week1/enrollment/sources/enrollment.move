@@ -10,8 +10,7 @@ module cohort::enrollment {
     use std::{
         string::{String, from_ascii},
         ascii,
-        vector,
-        debug::print
+        vector
     };
 
     const EEnrollmentNotOpen:u64 = 0;
@@ -26,7 +25,7 @@ module cohort::enrollment {
         open_for_enrollment: bool
     }
 
-    struct Cadet has key, store {
+    struct Cadet has key {
         id: UID,
         github:String,
         cohort:ID
@@ -47,32 +46,9 @@ module cohort::enrollment {
         }, tx_context::sender(ctx))
     }
 
-    public entry fun add_instructor(_: &InstructorCap, recipient: address, ctx: &mut TxContext) {
-        transfer::transfer(InstructorCap {
-            id: object::new(ctx)
-        }, recipient)
-    }
-
-    public entry fun create_cohort(_: &InstructorCap, name: String, ctx: &mut TxContext) {
-        transfer::share_object(
-        Cohort {
-            id: object::new(ctx),
-            name, 
-            cadets: table::new(ctx),
-            open_for_enrollment: false
-        })
-    }
-
-    public entry fun toggle_signups(_: &InstructorCap, cohort: &mut Cohort) {
-        if (cohort.open_for_enrollment == false) {
-            cohort.open_for_enrollment = true;
-        } else {
-            cohort.open_for_enrollment = false;
-        }
-    }
-
-    public entry fun enroll(github: vector<u8>, cohort: &mut Cohort, ctx: &mut TxContext) {
-        internal_enroll(&github, cohort, ctx);
+    #[lint_allow(self_transfer)]
+    public entry fun enroll(cohort: &mut Cohort, github: vector<u8>, ctx: &mut TxContext) {
+        internal_enroll(cohort, &github, ctx);
         let name = from_ascii(ascii::string(github));
         let cadet = Cadet {
              id: object::new(ctx),
@@ -89,21 +65,66 @@ module cohort::enrollment {
         transfer::transfer(cadet, tx_context::sender(ctx))
     }
 
-    public entry fun update(github: vector<u8>, cohort: &mut Cohort, ctx: &TxContext) {
-        assert!(table::contains(&cohort.cadets, tx_context::sender(ctx)) == true, ENotSignedUp);
-        table::remove(&mut cohort.cadets, tx_context::sender(ctx));
-        print(cohort);
-        internal_enroll(&github, cohort, ctx)
+    public entry fun update(cohort: &mut Cohort, github: vector<u8>, ctx: &TxContext) {
+        let sender = tx_context::sender(ctx);
+
+        assert!(table::contains(&cohort.cadets, sender), ENotSignedUp);
+        table::remove(&mut cohort.cadets, sender);
+
+        internal_enroll(cohort, &github, ctx)
     }
+
+    // === View ===
 
     public fun cadets(self: &Cohort): &table::Table<address, String> {
         &self.cadets
     }
 
-    fun internal_enroll(github: &vector<u8>, cohort: &mut Cohort, ctx: &TxContext) {
-        assert!(cohort.open_for_enrollment == true, EEnrollmentNotOpen);
-        assert!(table::contains(&cohort.cadets, tx_context::sender(ctx)) == false, EAlreadySignedUp);
-        assert!(validate_github_username(github) == true, EInvalidGithubAccount);
+    public fun open_for_enrollment(self: &Cohort): bool {
+        self.open_for_enrollment
+    }  
+
+    public fun name(self: &Cohort): String {
+        self.name
+    }   
+
+    public fun github(self: &Cadet): String {
+        self.github
+    }
+
+    public fun cohort(self: &Cadet): ID {
+        self.cohort
+    }         
+
+    // === Admin ===
+
+    public entry fun new_instructor(_: &InstructorCap, recipient: address, ctx: &mut TxContext) {
+        transfer::transfer(InstructorCap {
+            id: object::new(ctx)
+        }, recipient)
+    }
+
+    public entry fun new_cohort(_: &InstructorCap, name: String, ctx: &mut TxContext) {
+        transfer::share_object(
+        Cohort {
+            id: object::new(ctx),
+            name, 
+            cadets: table::new(ctx),
+            open_for_enrollment: false
+        })
+    }
+
+    public entry fun toggle_signups(_: &InstructorCap, cohort: &mut Cohort) {
+       cohort.open_for_enrollment = !cohort.open_for_enrollment
+    }    
+
+    // === Internal ===
+
+    fun internal_enroll(cohort: &mut Cohort, github: &vector<u8>, ctx: &TxContext) {
+        assert!(cohort.open_for_enrollment, EEnrollmentNotOpen);
+        assert!(!table::contains(&cohort.cadets, tx_context::sender(ctx)), EAlreadySignedUp);
+        assert!(validate_github_username(github), EInvalidGithubAccount);
+
         let str_github = from_ascii(ascii::string(*github));
         table::add(&mut cohort.cadets, tx_context::sender(ctx), str_github)
     }
@@ -130,9 +151,7 @@ module cohort::enrollment {
         };
 
         true
-    }
-
-
+    }    
 
     fun length_too_long(length:u64) : bool {
         length > 39
