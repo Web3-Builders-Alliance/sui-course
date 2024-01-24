@@ -1,4 +1,4 @@
-# Prerequisites: Enrollment dApp
+# Enrollment dApp
 
 In this lesson, we are going to: 
 1. Learn how to use `@mysten/sui.js` to create a new keypair
@@ -22,14 +22,14 @@ To get started, we're going to create a keygen script and an airdrop script for 
 Start by opening up your Terminal. We're going to use `yarn` to create a new Typescript project.
 
 ```sh
-mkdir prereq && cd prereq
+mkdir enrollment && cd enrollment
 yarn init -y
 ```
 
-Now that we have our new project initialised, we're going to go ahead and add `typescript`, `bs58` and `@mysten/sui.js`, along with generating a `tsconfig.js` configuration file.
+Now that we have our new project initialised, we're going to go ahead and add `typescript`, and `@mysten/sui.js`, along with generating a `tsconfig.js` configuration file.
 
 ```sh
-yarn add @types/node typescript @mysten/sui.js bs58
+yarn add @types/node typescript @mysten/sui.js
 yarn add -D ts-node
 touch keygen.ts
 touch airdrop.ts
@@ -42,7 +42,7 @@ Finally, we're going to add some scripts in our `package.json` file to let us ru
 
 ```js
 {
-  "name": "prereq",
+  "name": "enrollment",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -72,7 +72,7 @@ We'll start by importing `Keypair` from `@mysten/sui.js`
 
 ```ts
 import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
-import { fromB64 } from "@mysten/sui.js/utils";
+import { fromB64, toHex } from "@mysten/sui.js/utils";
 ```
 
 Now we're going to create a new Keypair, like so:
@@ -137,12 +137,12 @@ We're also going to import our wallet and recreate the `Keypair` object using it
 import wallet from "./dev-wallet.json"
 
 // We're going to import our keypair from the wallet file
-const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
+const keypair = Ed25519Keypair.fromSecretKey(new Uint8Array(wallet));
 ```
 
 Now lets send off that airdrop reqest for Devnet Sui:
 ```ts
-((async () => {
+(async () => {
     try {
         let res = await requestSuiFromFaucetV0({
             host: getFaucetHost("devnet"),
@@ -154,13 +154,6 @@ Now lets send off that airdrop reqest for Devnet Sui:
         console.error(`Oops, something went wrong: ${e}`)
     }
 })();
-```
-
-Here is an example of the output of a successful airdrop:
-
-```
-Success! Check out your TX here:
-https://suiscan.xyz/devnet/object/0x69bb5db57b07bee4dc2a141fa02aeafc892fcc5a14627a2f7c2dc1859ce8b9a2
 ```
 
 ## 3. Transfer tokens to your WBA Address
@@ -250,7 +243,7 @@ Let's dive into it!
 #### 5.1 Looking at the Explorer to 
 For the purposes of this class, we have published a WBA pre-requisite course program to the Sui Devnet.
 
-You can find our enrollment module on Devnet by this address: [0x8a01cf24865096d16381f085707026a924c63f18ea39f14dec772b363818a1f7](https://suiexplorer.com/object/0x8a01cf24865096d16381f085707026a924c63f18ea39f14dec772b363818a1f7?module=enrollment&network=devnet)
+You can find our enrollment module on Devnet by this address: [0x326054a2db6192fcd3085cfde6e92d1a917f3df953f5327f7d4e3c1457e8816e](https://suiexplorer.com/object/0x326054a2db6192fcd3085cfde6e92d1a917f3df953f5327f7d4e3c1457e8816e?module=enrollment&network=devnet)
 
 If we explore the devnet explorer, there is a section called "[Execute] which gives us a easy way to interact with a module, instead of using that lets do it in typescript instead.
 
@@ -264,6 +257,9 @@ import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
 import { bcs} from "@mysten/sui.js/bcs";
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import wallet from "../wba-wallet.json"
+
+const enrollment_object_id = "";
+const cohort = "";
 ```
 
 Note that we've imported a new wallet filed called `wba-wallet.json`. Unlike the dev-wallet.json, this should contain the private key for an account you might care about. To stop you from accidentally comitting your private key(s) to a git repo, consider adding a `.gitignore` file. Here's an example that will ignore all files that end in `wallet.json`:
@@ -305,7 +301,7 @@ Now, we can create a Move Call and talk to the onchain module.
 ```ts
 let enroll = txb.moveCall({
     target: `${enrollment_object_id}::enrollment::enroll`,
-    arguments: [serialized_github, txb.object(cohort)],
+    arguments: [txb.object(cohort), serialized_github],
 });
 ```
 
@@ -316,6 +312,10 @@ let txid = await client.signAndExecuteTransactionBlock({ signer: keypair, transa
 console.log(`Success! Check our your TX here:
 https://suiexplorer.com/txblock/${txid.digest}?network=devnet`);
 ```
+
+You may have notice you are missing a few thigs, notably enrollment_object_id. you can find this above in the readme.
+
+You are also missing the id for the cohort object. using the block explorer and the enrollment id you will need to find it.
 
 #### 5.3 Putting it all together
 Now that we have everything we need, it's finally time to put it all together and make a transaction interacting with the devnet program to submit our `github` account and our `publicKey` to signify our completion of the WBA pre-requisite materials!
