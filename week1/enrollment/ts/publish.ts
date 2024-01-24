@@ -18,7 +18,7 @@ interface Program {
 
 (async () => {
     try {
-        let program = buildPackage("/Users/ivmidable/Development/sui/sui-course")
+        let program = buildPackage("../sources/enrollment.move");
         
         console.log(program);
         const txb = new TransactionBlock();
