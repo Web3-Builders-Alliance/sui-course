@@ -1,12 +1,14 @@
 # Bank dApp
 
-In this lesson, we are going to: 
+In this lesson, we are going to:
+
 1. Create a new Sui Move module
 2. Using Capabilities
 3. Storing coins in a vault
 4. Charging a admin fee for depositing coins
 
 Prerequisites:
+
 1. Have Sui CLI Installed
 2. Have VSCode Installed
 3. sui-move-analyzer extension for VSCode is not required but it is very useful.
@@ -18,6 +20,7 @@ Let's get into it!
 To get started, we're going to create a new move package and an create a module for our package.
 
 #### 1.1 Setting up
+
 Start by opening up your Terminal. We're going to use the sui cli to create a new Sui Move Package.
 
 ```sh
@@ -28,6 +31,7 @@ touch sources/bank.move
 Now open up the package directory in VSCode.
 
 #### 1.2 Create a new module
+
 Open up `bank.move` and lets start building this package.
 
 ```ts
@@ -44,7 +48,7 @@ We'll start by importing `UID` from `sui::object`
 use sui::object::{Self, UID};
 ```
 
-Now we're going to create a few structs, namly our `Bank` object, `OwnerCap` capability and our balances.
+Now we're going to create a few structs, namely our `Bank` object, `OwnerCap` capability and our balances.
 
 ```rust
   struct Bank has key {
@@ -62,10 +66,11 @@ Now we're going to create a few structs, namly our `Bank` object, `OwnerCap` cap
 Now since the admin of this bank is going to charge a fee lets go ahead and add that as well.
 
 ```rust
-const FEE: u64 = 500;
+const FEE: u64 = 5;
 ```
 
 ### 1.3 Add Some Functions
+
 This module will have four functions, `init`, `deposit`, `withdraw`, and `claim`
 
 ```rust
@@ -87,12 +92,14 @@ public fun claim(_: &OwnerCap, self: &mut Bank, ctx: &mut TxContext): Coin<SUI> 
 ```
 
 ## 2. Challenge Requirements
+
 Now that we have a basic layout of our module lets go over some of the things you will need to complete for this challenge.
 
 #### 2.1 Init
+
 Inside of out init function we need to create a new `Bank` object.
 
-Since bank is a Sui Object with a UID that means we need to call
+Since bank is a Sui Object with a UID that means we need to call object::new with the transaction context.
 
 ```rust
 let bank = Bank { id: object::new(ctx) };
@@ -103,7 +110,7 @@ After that we need to add a `AdminBalance` to a dynamic_field that will referenc
 The built in dynamic field add function has a signature like so:
 
 ```rust
-/// Adds a dynamic field to the object `object: &mut UID` at field specified by `name: Name`.
+    /// Adds a dynamic field to the object `object: &mut UID` at field specified by `name: Name`.
     /// Aborts with `EFieldAlreadyExists` if the object already has that field with that name.
     public fun add<Name: copy + drop + store, Value: store>
 ```
@@ -116,12 +123,14 @@ dynamic_field::add(.., .., ..);
 
 Now fill in the various arguments with the correct data based on what you read above.
 
-Now inside of the same init function we need to call two methods belonging to the transfer module. first is share_object, our goal is to share the bank object and then we need to transfer the `OwnerCap` to the sender. 
+Now inside of the same init function we need to call two methods belonging to the transfer module. first is share_object, our goal is to share the bank object and then we need to transfer the `OwnerCap` to the sender.
 
 ```rust
 transfer::share_object(..)
 ```
+
 and
+
 ```rust
 transfer::transfer(..)
 ```
@@ -129,9 +138,11 @@ transfer::transfer(..)
 Once that is done we can move on to Deposit
 
 #### 2.2 Deposit
+
 So inside of the deposit function we need to get the value of the `token` send in as a argument.
 
 We can do that by calling:
+
 ```rust
 let value = coin::value(&token);
 ```
@@ -143,7 +154,7 @@ let deposit_value = value - (value * FEE / 100);
 let admin_fee = value - deposit_value;
 ```
 
-Now we need to check if the dynamic field for the UserBalance already exists, if it does we can update the balance by joinin the newly deposits coins to the bank. IF not we need to go ahead and add the UserBalance to a dyamic field as well.
+Now we need to check if the dynamic field for the UserBalance already exists, if it does we can update the balance by joining the newly deposits coins to the bank. If not, we need to go ahead and add a new UserBalance dynamic field.
 
 ```rust
 if (df::exists_(&self.id, UserBalance { user: sender })) {
@@ -155,24 +166,29 @@ if (df::exists_(&self.id, UserBalance { user: sender })) {
 ```
 
 #### 2.3 Withdraw
-The code for withdraw is very simiar to deposit except that is stead of `dynamic_field::add` if the dynamic field doesnt we need to set the balance to zero.
+
+The code for withdraw is very similar to deposit except that instead of `dynamic_field::add`, we will use `dynamic_field::remove`. Please note that the withdraw function does not throw if the user has no balance. It returns a coin with a value of zero.
 
 ```rust
 coin::zero(ctx);
 ```
 
 #### 2.4 Claim
-Last but not least we need to have a public functio that allows the Owner to remove the coins that were paid as a fee
+
+Last but not least we need to have a public function that allows the Owner to remove the coins that were paid as a fee.
 
 ```rust
 public fun claim(_: &OwnerCap, self: &mut Bank, ctx: &mut TxContext): Coin<SUI> {
     coin::from_balance(df::remove(&mut self.id, AdminBalance {}), ctx)
-}  
+}
 ```
 
 ## 3 Finish up
-By this point you should have a good scaffold going to finish the remanining code on your own.
+
+By this point you should have a good scaffold going to finish the remaining code on your own.
 
 You will need to add more `use` includes in your module to pull in various things from the Sui framework.
+
+Please refer to the [Sui Framework](https://github.com/MystenLabs/sui/tree/main/crates/sui-framework/packages/sui-framework/sources), while you are BUIDLin. It is the best way to quickly improve your Sui Move skills.
 
 Good luck and if you have any questions let us know in the discord.
