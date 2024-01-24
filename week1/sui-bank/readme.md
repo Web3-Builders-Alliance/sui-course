@@ -189,7 +189,7 @@ public fun claim(_: &OwnerCap, self: &mut Bank, ctx: &mut TxContext): Coin<SUI> 
 We challenge the cadets to add a getter function that allows anyone to know how much balance a user has in the bank.
 
 ```rust
-public fun balance(_: &OwnerCap, self: &mut Bank, user: address): u64 {
+public fun balance(self: &mut Bank, user: address): u64 {
     // Good Luck
 }
 ```
