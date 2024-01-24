@@ -1,4 +1,4 @@
-# Enrollment dApp
+# Bank dApp
 
 In this lesson, we are going to: 
 1. Create a new Sui Move module
