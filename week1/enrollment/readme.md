@@ -110,7 +110,7 @@ If we want to save this wallet locally. To do this, we're going run the followin
 ```sh
 touch dev-wallet.json
 ```
-This creates the file `dev-wallet.json` in our `./prereq` root directory. Now we just need to paste the private key from above into this file, like so:
+This creates the file `dev-wallet.json` in our root directory. Now we just need to paste the private key from above into this file, like so:
 
 ```json
 [91,148,165,44,176,23,3,34,241,109,55,196,245,26,167,220,155,131,49,23,168,115,195,112,146,72,50,95,213,137,211,6]
@@ -174,7 +174,7 @@ import wallet from "./dev-wallet.json"
 const keypair = Ed25519Keypair.fromSecretKey(new Uint8Array(wallet));
 
 // Define our WBA SUI Address
-const to = "0xcd639240b79c9ca1677418b4c6a49b9503a65d84a3763772f55d59359e981ec2";
+const to = <your WBA SUI wallet address>;
 ```
 
 And create a devnet client:
