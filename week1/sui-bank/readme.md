@@ -21,7 +21,7 @@ To get started, we're going to create a new move package and an create a module 
 
 #### 1.1 Setting up
 
-Start by opening up your Terminal. We're going to use the sui cli to create a new Sui Move Package.
+Begin by opening your terminal. We will use the Sui CLI to create a new Sui Move Package.
 
 ```sh
 sui move new bank && cd bank
@@ -40,7 +40,7 @@ module bank::bank {
 }
 ```
 
-Now that we have the bare minimum for a module, let's add some imports to it.
+After establishing the module's basic structure, let's include some necessary imports.
 
 We'll start by importing `UID` from `sui::object`
 
@@ -48,7 +48,7 @@ We'll start by importing `UID` from `sui::object`
 use sui::object::{Self, UID};
 ```
 
-Now we're going to create a few structs, namely our `Bank` object, `OwnerCap` capability and our balances.
+Next, let's define several structs, including our `Bank` object, `OwnerCap` capability, and various balances.
 
 ```rust
   struct Bank has key {
@@ -63,7 +63,7 @@ Now we're going to create a few structs, namely our `Bank` object, `OwnerCap` ca
   struct AdminBalance has copy, drop, store {}
 ```
 
-Now since the admin of this bank is going to charge a fee lets go ahead and add that as well. Note how the fee is an u128 and not u64.
+Since the admin of this bank will charge a fee, let's define that fee. Note that the fee is a `u128`, not `u64`.
 
 ```rust
 const FEE: u128 = 5;
@@ -71,7 +71,7 @@ const FEE: u128 = 5;
 
 ### 1.3 Add Some Functions
 
-This module will have four functions, `init`, `deposit`, `withdraw`, and `claim`
+Now, let's define four functions for this module: `init`, `deposit`, `withdraw`, and `claim`.
 
 ```rust
 fun init(ctx: &mut TxContext) {
@@ -97,7 +97,7 @@ Now that we have a basic layout of our module lets go over some of the things yo
 
 #### 2.1 Init
 
-Inside of out init function we need to create a new `Bank` object.
+Within our `init` function, we must create a new `Bank `object.
 
 Since bank is a Sui Object with a UID that means we need to call object::new with the transaction context.
 
@@ -139,7 +139,8 @@ Once that is done we can move on to Deposit
 
 #### 2.2 Deposit
 
-So inside of the deposit function we need to get the value of the `token` send in as a argument.
+In the deposit function, retrieve the value of the `token` passed as an argument.
+
 
 We can do that by calling:
 
@@ -155,7 +156,7 @@ let deposit_value = value - (((value as u128) * FEE / 100) as u64);
 let admin_fee = value - deposit_value;
 ```
 
-Now we need to check if the dynamic field for the UserBalance already exists, if it does we can update the balance by joining the newly deposits coins to the bank. If not, we need to go ahead and add a new UserBalance dynamic field.
+Now we need to check if the dynamic field for the UserBalance already exists, if it does we can update the balance by joining the newly deposited coins to the bank. If not, we need to go ahead and add a new UserBalance dynamic field.
 
 ```rust
 if (df::exists_(&self.id, UserBalance { user: sender })) {
