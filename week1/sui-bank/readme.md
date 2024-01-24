@@ -63,10 +63,10 @@ Now we're going to create a few structs, namely our `Bank` object, `OwnerCap` ca
   struct AdminBalance has copy, drop, store {}
 ```
 
-Now since the admin of this bank is going to charge a fee lets go ahead and add that as well.
+Now since the admin of this bank is going to charge a fee lets go ahead and add that as well. Note how the fee is an u128 and not u64.
 
 ```rust
-const FEE: u64 = 5;
+const FEE: u128 = 5;
 ```
 
 ### 1.3 Add Some Functions
@@ -150,7 +150,8 @@ let value = coin::value(&token);
 Now we can calculate the deposit value and the admin fee
 
 ```rust
-let deposit_value = value - (value * FEE / 100);
+// To avoid overflows, we cast the value to u128 when multiplying then cast it back to u64.
+let deposit_value = value - (((value as u128) * FEE / 100) as u64);
 let admin_fee = value - deposit_value;
 ```
 
@@ -180,6 +181,16 @@ Last but not least we need to have a public function that allows the Owner to re
 ```rust
 public fun claim(_: &OwnerCap, self: &mut Bank, ctx: &mut TxContext): Coin<SUI> {
     coin::from_balance(df::remove(&mut self.id, AdminBalance {}), ctx)
+}
+```
+
+#### 2.5 Bonus: Balance
+
+We challenge the cadets to add a getter function that allows anyone to know how much balance a user has in the bank.
+
+```rust
+public fun balance(_: &OwnerCap, self: &mut Bank, user: address): u64 {
+    // Good Luck
 }
 ```
 

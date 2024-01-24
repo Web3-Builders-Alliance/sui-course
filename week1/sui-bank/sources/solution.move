@@ -18,7 +18,7 @@ module sui_bank::solution {
   struct UserBalance has copy, drop, store { user: address }
   struct AdminBalance has copy, drop, store {}
 
-  const FEE: u64 = 5;
+  const FEE: u128 = 5;
 
   fun init(ctx: &mut TxContext) {
     let bank = Bank { id: object::new(ctx) };
@@ -34,7 +34,7 @@ module sui_bank::solution {
   
   public fun deposit(self: &mut Bank, token: Coin<SUI>, ctx: &mut TxContext) {
     let value = coin::value(&token);
-    let deposit_value = value - (value * FEE / 100);
+    let deposit_value = value - (((value as u128) * FEE / 100) as u64);
     let admin_fee = value - deposit_value;
 
     let admin_coin = coin::split(&mut token, admin_fee, ctx);
