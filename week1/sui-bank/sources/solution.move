@@ -60,6 +60,8 @@ module sui_bank::solution {
   }
 
   public fun claim(_: &OwnerCap, self: &mut Bank, ctx: &mut TxContext): Coin<SUI> {
-    coin::from_balance(df::remove(&mut self.id, AdminBalance {}), ctx)
+    let balance_mut = df::borrow_mut<AdminBalance, Balance<SUI>>(&mut self.id, AdminBalance {});
+    let total_admin_bal = balance::value(balance_mut);
+    coin::take(balance_mut, total_admin_bal, ctx)
   }    
 }
