@@ -20,6 +20,8 @@ module sui_bank::solution {
 
   const FEE: u128 = 5;
 
+  const ENotEnoughBalance: u64 = 0;
+
   fun init(ctx: &mut TxContext) {
     let bank = Bank { id: object::new(ctx) };
 
@@ -31,6 +33,19 @@ module sui_bank::solution {
 
     transfer::transfer(OwnerCap { id: object::new(ctx) }, tx_context::sender(ctx));
   }
+
+  public fun user_balance(self: &Bank, user: address): u64 {
+    let key = UserBalance { user };
+    if (df::exists_(&self.id, key)) {
+      balance::value(df::borrow<UserBalance, Balance<SUI>>(&self.id, key))
+    } else {
+      0
+    }
+  }
+
+  public fun admin_balance(self: &Bank): u64 {
+    balance::value(df::borrow<AdminBalance, Balance<SUI>>(&self.id, AdminBalance {}))
+  }  
   
   public fun deposit(self: &mut Bank, token: Coin<SUI>, ctx: &mut TxContext) {
     let value = coin::value(&token);
@@ -59,9 +74,22 @@ module sui_bank::solution {
     }
   }
 
+  public fun partial_withdraw(self: &mut Bank, value: u64, ctx: &mut TxContext): Coin<SUI> {
+    let balance_mut = df::borrow_mut<UserBalance, Balance<SUI>>(&mut self.id, UserBalance { user: tx_context::sender(ctx) });
+
+    assert!(balance::value(balance_mut) >= value, ENotEnoughBalance);
+
+    coin::take(balance_mut, value, ctx)
+  }
+
   public fun claim(_: &OwnerCap, self: &mut Bank, ctx: &mut TxContext): Coin<SUI> {
     let balance_mut = df::borrow_mut<AdminBalance, Balance<SUI>>(&mut self.id, AdminBalance {});
     let total_admin_bal = balance::value(balance_mut);
     coin::take(balance_mut, total_admin_bal, ctx)
   }    
+
+  #[test_only]
+  public fun init_for_testing(ctx: &mut TxContext) {
+    init(ctx);
+  }
 }
