@@ -8,6 +8,7 @@ In this lesson, we are going to:
 4. Use assertions to validate behavior.
 
 ## 0. Why do we test?
+
 In the old days of programming debuggers were all the rage, you would set breakpoints and then step into/over code and view the behavior to make sure things were behaving correctly but as time went on this was seen as insuffient to creating reliable code. So in 1997 the first unit test framework was created and it slowly became the norm.
 
 The great thing about tests is that as a program evolves you have a fast and efficient way of verifying that the new code does not break the code that has been written prior! The fact is the stakes are high when writing programs and it should be treated as such, in classical programming you can have memory leaks which could cause the program to crash unexpectidly, crash the operating system or freeze it. While thats already bad when it comes to on-chain programs it gets even worse because we can have `Money Leaks`. None of us want to cause a user to lose money because of a money leak so it is imperritive we test our code and test it well!
@@ -23,7 +24,7 @@ To start unit testing we will need to create a test module, test modules are no 
 Lets create the module below.
 
 ```rust
-module bank::bank_tests { 
+module bank::bank_tests {
     /*...*/
 }
 ```
@@ -75,7 +76,6 @@ module sui::test_utils {
 ```
 
 There are two more annotations we will be using in our tests, `#[test]` and `#[expect_failure]`. Can you guess what these annotations do? if you guessed that `#[test]` is used to define a unit test and `#[expect_failre]` tells the compiler that the unit test should fail you'd be right!
-
 
 #### 1.4 Test Senarios
 
@@ -147,7 +147,6 @@ The above test doesn't do much at this point, but it does make sure our init fun
 
 So we have our first test case, now lets deposit some sui. To do this we will create two more helper functions so we stay true to the [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) principle.
 
-
 ```rust
   fun deposit_test_helper(scenario: &mut ts::Scenario, id:ID, amount:u64) {
     ts::next_tx(scenario, id);
@@ -172,7 +171,7 @@ Now lets dive in further:
 
       assert_eq(bank::user_balance(&bank, addr), user_amount);
       assert_eq(bank::admin_balance(&bank), admin_amount);
-      
+
       ts::return_shared(bank);
     };
   }
@@ -218,8 +217,7 @@ The next step would be to do a reserve test, lets pass in the wrong fee_percent 
 ```
 
 ## 3. Challenge Time!
+
 Ok now the challenge from here on is to finish the testing, you must create a `withdraw_test`, and a `claim_test`. Don't just test for success you should test for failure as well for better coverage!
 
 Good luck and if you have any questions let us know in the discord.
-
-

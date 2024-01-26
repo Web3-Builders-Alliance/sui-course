@@ -1,8 +1,9 @@
-module sui_bank::solution_tests { 
+#[test_only]
+module sui_bank::solutions_tests { 
 
   use sui::test_utils::assert_eq;
   use sui::coin::{mint_for_testing, burn_for_testing};
-  use sui::test_scenario::{Self, next_tx,Scenario, ctx};
+  use sui::test_scenario::{Self, next_tx, Scenario, ctx};
 
   use sui_bank::solution::{Self, Bank, OwnerCap};
 
@@ -165,7 +166,7 @@ module sui_bank::solution_tests {
     scenario
   }
 
-  fun deposit(bank: &mut Bank, value: u64, scenario_mut: &mut Scenario,) {
+  fun deposit(bank: &mut Bank, value: u64, scenario_mut: &mut Scenario) {
     solution::deposit(bank, mint_for_testing(value, ctx(scenario_mut)), ctx(scenario_mut));
   }
 }
