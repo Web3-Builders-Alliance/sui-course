@@ -99,7 +99,7 @@ Enough chatting lets build our first test case!
 
 ### 2. Lets Init!
 
-Our bank app has four functions `init`, `deposit`, `withdraw`, and `claim` so first we will right a test for `init`. Since we are placing our tests outside of our `bank` module and inside of their own `bank_test` module we need to add a single `#[test_only]` function inside of `bank`.
+Our bank app has four functions `init`, `deposit`, `withdraw`, and `claim` so first we will write a test for `init`. Since we are placing our tests outside of our `bank` module and inside of their own `bank_test` module we need to add a single `#[test_only]` function inside of `bank`.
 
 Scroll to the very bottom of `bank.move` and add the following line:
 
@@ -201,7 +201,7 @@ Now that our helper is finished lets add it to the test case.
 
 Nice! we now have a completed test case for depositing into our bank, if you run `sui move test` it should pass!
 
-The next step would be to do a reserve test, lets pass in the wrong fee_percent and make sure the test fails.
+The next step would be to do a reverse test, lets pass in the wrong fee_percent and make sure the test fails.
 
 ```rust
     #[test]
