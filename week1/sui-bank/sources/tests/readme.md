@@ -149,7 +149,7 @@ So we have our first test case, now lets deposit some sui. To do this we will cr
 
 
 ```rust
-  fun deposit_test_helper(scenario: &mut ts::Scenario, id:ID, amount:u64) {
+  fun deposit_test_helper(scenario: &mut ts::Scenario, addr:address, amount:u64) {
     ts::next_tx(scenario, id);
     {
         /*...*/
