@@ -2,7 +2,7 @@ module sui_bank::solution_tests {
 
   use sui::test_utils::assert_eq;
   use sui::coin::{mint_for_testing, burn_for_testing};
-  use sui::test_scenario::{Self, next_tx, ctx};
+  use sui::test_scenario::{Self, next_tx,Scenario, ctx};
 
   use sui_bank::solution::{Self, Bank, OwnerCap};
 
@@ -11,19 +11,14 @@ module sui_bank::solution_tests {
 
   #[test]
   fun test_deposit() {
-    let scenario = test_scenario::begin(ADMIN);
+    let scenario = init_bank();
     let scenario_mut = &mut scenario;
-
-    next_tx(scenario_mut, ADMIN);
-    {
-      solution::init_for_testing(ctx(scenario_mut));
-    };
 
     next_tx(scenario_mut, ALICE); 
     {
       let bank = test_scenario::take_shared<Bank>(scenario_mut);
 
-      solution::deposit(&mut bank, mint_for_testing(100, ctx(scenario_mut)), ctx(scenario_mut));
+      deposit(&mut bank, 100, scenario_mut);
 
       assert_eq(solution::admin_balance(&bank), 5);
       assert_eq(solution::user_balance(&bank, ALICE), 95);
@@ -35,7 +30,7 @@ module sui_bank::solution_tests {
     {
       let bank = test_scenario::take_shared<Bank>(scenario_mut);
 
-      solution::deposit(&mut bank, mint_for_testing(50, ctx(scenario_mut)), ctx(scenario_mut));
+      deposit(&mut bank, 50, scenario_mut);
 
       assert_eq(solution::admin_balance(&bank), 7);
       assert_eq(solution::user_balance(&bank, ALICE), 143);
@@ -49,13 +44,8 @@ module sui_bank::solution_tests {
 
   #[test]
   fun test_withdraw() {
-    let scenario = test_scenario::begin(ADMIN);
+    let scenario = init_bank();
     let scenario_mut = &mut scenario;
-
-    next_tx(scenario_mut, ADMIN);
-    {
-      solution::init_for_testing(ctx(scenario_mut));
-    };
 
     next_tx(scenario_mut, ALICE); 
     {
@@ -72,7 +62,7 @@ module sui_bank::solution_tests {
     {
       let bank = test_scenario::take_shared<Bank>(scenario_mut);
 
-      solution::deposit(&mut bank, mint_for_testing(100, ctx(scenario_mut)), ctx(scenario_mut));
+      deposit(&mut bank, 100, scenario_mut);
       
       assert_eq(solution::user_balance(&bank, ALICE), 95);
       
@@ -89,19 +79,14 @@ module sui_bank::solution_tests {
 
   #[test]
   fun test_partial_withdraw() {
-    let scenario = test_scenario::begin(ADMIN);
+    let scenario = init_bank();
     let scenario_mut = &mut scenario;
-
-    next_tx(scenario_mut, ADMIN);
-    {
-      solution::init_for_testing(ctx(scenario_mut));
-    };
 
     next_tx(scenario_mut, ALICE); 
     {
       let bank = test_scenario::take_shared<Bank>(scenario_mut);
 
-      solution::deposit(&mut bank, mint_for_testing(100, ctx(scenario_mut)), ctx(scenario_mut));
+      deposit(&mut bank, 100, scenario_mut);
       
       assert_eq(solution::user_balance(&bank, ALICE), 95);
       
@@ -118,20 +103,15 @@ module sui_bank::solution_tests {
 
   #[test]
   fun test_claim() {
-    let scenario = test_scenario::begin(ADMIN);
+    let scenario = init_bank();
     let scenario_mut = &mut scenario;
-
-    next_tx(scenario_mut, ADMIN);
-    {
-      solution::init_for_testing(ctx(scenario_mut));
-    };
 
     next_tx(scenario_mut, ADMIN); 
     {
       let cap = test_scenario::take_from_sender<OwnerCap>(scenario_mut);
       let bank = test_scenario::take_shared<Bank>(scenario_mut);
 
-      solution::deposit(&mut bank, mint_for_testing(100, ctx(scenario_mut)), ctx(scenario_mut));
+      deposit(&mut bank, 100, scenario_mut);
       
       assert_eq(solution::admin_balance(&bank), 5);
       
@@ -150,19 +130,14 @@ module sui_bank::solution_tests {
   #[test]
   #[expected_failure(abort_code = solution::ENotEnoughBalance)]
   fun test_partial_withdraw_not_enough_balance() {
-    let scenario = test_scenario::begin(ADMIN);
+    let scenario = init_bank();
     let scenario_mut = &mut scenario;
-
-    next_tx(scenario_mut, ADMIN);
-    {
-      solution::init_for_testing(ctx(scenario_mut));
-    };
 
     next_tx(scenario_mut, ALICE); 
     {
       let bank = test_scenario::take_shared<Bank>(scenario_mut);
 
-      solution::deposit(&mut bank, mint_for_testing(100, ctx(scenario_mut)), ctx(scenario_mut));
+      deposit(&mut bank, 100, scenario_mut);
       
       assert_eq(solution::user_balance(&bank, ALICE), 95);
       
@@ -174,5 +149,23 @@ module sui_bank::solution_tests {
     };
 
     test_scenario::end(scenario);    
+  }
+
+  // helpers
+
+  fun init_bank(): Scenario {
+   let scenario = test_scenario::begin(ADMIN);
+    let scenario_mut = &mut scenario;
+
+    next_tx(scenario_mut, ADMIN);
+    {
+      solution::init_for_testing(ctx(scenario_mut));
+    };
+
+    scenario
+  }
+
+  fun deposit(bank: &mut Bank, value: u64, scenario_mut: &mut Scenario,) {
+    solution::deposit(bank, mint_for_testing(value, ctx(scenario_mut)), ctx(scenario_mut));
   }
 }
