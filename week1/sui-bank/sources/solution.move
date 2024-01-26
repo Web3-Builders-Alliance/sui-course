@@ -86,8 +86,27 @@ module sui_bank::solution {
     let balance_mut = df::borrow_mut<AdminBalance, Balance<SUI>>(&mut self.id, AdminBalance {});
     let total_admin_bal = balance::value(balance_mut);
     coin::take(balance_mut, total_admin_bal, ctx)
-  }    
+  }   
 
+  // ENTRY FNS
+  
+  entry fun entry_deposit(self: &mut Bank, token: Coin<SUI>, ctx: &mut TxContext) {
+    deposit(self, token, ctx);
+  } 
+
+  entry fun withdraw_and_keep(self: &mut Bank, ctx: &mut TxContext) {
+    transfer::public_transfer(withdraw(self, ctx), tx_context::sender(ctx));
+  } 
+
+  entry fun partial_withdraw_and_keep(self: &mut Bank, value: u64, ctx: &mut TxContext) {
+    transfer::public_transfer(partial_withdraw(self, value, ctx), tx_context::sender(ctx));
+  } 
+
+  entry fun claim_and_keep(_: &OwnerCap, self: &mut Bank, ctx: &mut TxContext) {
+    transfer::public_transfer(claim(_, self, ctx), tx_context::sender(ctx));
+  }      
+
+  // TEST ONLY
   #[test_only]
   public fun init_for_testing(ctx: &mut TxContext) {
     init(ctx);
