@@ -75,7 +75,7 @@ module sui::test_utils {
 }
 ```
 
-There are two more annotations we will be using in our tests, `#[test]` and `#[expect_failure]`. Can you guess what these annotations do? if you guessed that `#[test]` is used to define a unit test and `#[expect_failre]` tells the compiler that the unit test should fail you'd be right!
+There are two more annotations we will be using in our tests, `#[test]` and `#[expect_failure]`. Can you guess what these annotations do? if you guessed that `#[test]` is used to define a unit test and `#[expect_failure]` tells the compiler that the unit test should fail you'd be right!
 
 #### 1.4 Test Senarios
 
