@@ -81,7 +81,7 @@ module sui_bank::bank {
     account.debt
   } 
 
-  public fun deposit(account: &Account): u64 {
+  public fun account_deposit(account: &Account): u64 {
     account.deposit
   }    
 
