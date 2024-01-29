@@ -1,10 +1,8 @@
-# Sui Bank Week2
-
-## Patterns
+# Patterns
 
 ### Object wrapping
 
-```move
+```rust
   struct CapWrapper has key {
     id: UID,
     cap: TreasuryCap<SUI_DOLLAR>
@@ -15,7 +13,7 @@ It allows us to add access control to shared objects by wrapping them inside an 
 
 ### Access control via capabilities and not via an `address`
 
-```move
+```rust
   struct Bank has key {
     id: UID,
     balance: Balance<SUI>,
@@ -34,7 +32,7 @@ We do store the user balance and debt inside an owned object that can be held by
 
 ### Destroy functions
 
-```move
+```rust
   public fun destroy_empty_account(account: Account) {
     let Account { id, debt: _, deposit, user: _ } = account;
     assert!(deposit == 0, EAccountMustBeEmpty);
