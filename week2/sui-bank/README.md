@@ -42,11 +42,11 @@ We do store the user balance and debt inside an owned object that can be held by
 
 The Sui blockchain gives Sui rebates when objects are deleted as it frees up storage slots. It is best practice to provide means for objects to be destroyed. Do keep in mind that you should ensure that the objects being deleted are empty to prevent loss of funds.
 
-## Challenge
+## Challenges
 
-Write a two swap functions with the signature below:
+- Write a two swap functions with the signature below:
 
-```move
+```rust
   public fun swap_sui(self: &mut Bank, acc: &mut Account, coin_in: Coin<SUI>, ctx: &mut TxContext): Coin<SUI_DOLLAR> {
     abort(0)
   }
@@ -55,3 +55,5 @@ Write a two swap functions with the signature below:
     abort(0)
   }
 ```
+
+- Replace SUI with your custom Coin and add a faucet!
