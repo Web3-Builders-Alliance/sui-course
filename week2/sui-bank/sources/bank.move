@@ -3,7 +3,6 @@ module sui_bank::bank {
   use sui::transfer;
   use sui::coin::{Self, Coin};
   use sui::object::{Self, UID};
-  use sui::table::{Self, Table};
   use sui::balance::{Self, Balance};
   use sui::tx_context::{Self, TxContext};
 
@@ -12,7 +11,6 @@ module sui_bank::bank {
   struct Bank has key {
     id: UID,
     balance: Balance<SUI>,
-    accounts: Table<address, u64>,
     admin_balance: Balance<SUI>,
   }
 
@@ -40,7 +38,6 @@ module sui_bank::bank {
       Bank {
         id: object::new(ctx),
         balance: balance::zero(),
-        accounts: table::new(ctx),
         admin_balance: balance::zero()
       }
     );
@@ -67,12 +64,6 @@ module sui_bank::bank {
     balance::value(&self.admin_balance)
   }
 
-  public fun account(self: &Bank, user:address): u64 {
-    if (contains_deposit(self, user)) {
-      *table::borrow(&self.accounts, user)
-    } else { 0 }            
-  }
-
   public fun user(account: &Account): address {
     account.user
   }
@@ -96,23 +87,13 @@ module sui_bank::bank {
     balance::join(&mut self.admin_balance, coin::into_balance(admin_coin));
     balance::join(&mut self.balance, coin::into_balance(token));
 
-    if (contains_deposit(self, account.user)) {
-      let balance_mut = table::borrow_mut(&mut self.accounts, account.user);
-      *balance_mut = *balance_mut + deposit_value;
-      account.deposit = account.deposit + deposit_value;
-    } else {
-      table::add(&mut self.accounts, account.user, deposit_value);
-      account.deposit = deposit_value;
-    };
+    account.deposit = account.deposit + deposit_value;
   }  
 
   public fun withdraw(self: &mut Bank, account: &mut Account, value: u64, ctx: &mut TxContext): Coin<SUI> {
     assert!(account.debt == 0, EPayYourLoan);
     assert!(account.deposit >= value, ENotEnoughBalance);
 
-    let balance_mut = table::borrow_mut(&mut self.accounts, account.user);
-
-    *balance_mut = *balance_mut - value;
     account.deposit = account.deposit - value;
 
     coin::from_balance(balance::split(&mut self.balance, value), ctx)
@@ -146,10 +127,4 @@ module sui_bank::bank {
     let value = balance::value(&self.admin_balance);
     coin::take(&mut self.admin_balance, value, ctx)
   }    
-
-  // === Private Functions ===   
-
-  fun contains_deposit(self: &Bank, user: address): bool {
-    table::contains(&self.accounts, user)
-  }
 }
