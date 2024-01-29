@@ -26,7 +26,7 @@ module sui_bank::bank {
   }
 
   const ENotEnoughBalance: u64 = 0;
-  const EBorrowHaveTooHigh: u64 = 1;
+  const EBorrowAmountIsTooHigh: u64 = 1;
   const EAccountMustBeEmpty: u64 = 2;
   const EPayYourLoan: u64 = 3;
 
@@ -102,7 +102,7 @@ module sui_bank::bank {
   public fun borrow(account: &mut Account, cap: &mut CapWrapper, value: u64, ctx: &mut TxContext): Coin<SUI_DOLLAR> {
     let max_borrow_amount = (((account.deposit as u128) * EXCHANGE_RATE / 100) as u64);
 
-    assert!(max_borrow_amount >= account.debt + value, EBorrowHaveTooHigh);
+    assert!(max_borrow_amount >= account.debt + value, EBorrowAmountIsTooHigh);
 
     account.debt = account.debt + value;
 
