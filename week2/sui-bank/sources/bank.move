@@ -73,6 +73,18 @@ module sui_bank::bank {
     } else { 0 }            
   }
 
+  public fun user(account: &Account): address {
+    account.user
+  }
+
+  public fun debt(account: &Account): u64 {
+    account.debt
+  } 
+
+  public fun deposit(account: &Account): u64 {
+    account.deposit
+  }    
+
   // === Public Mut Functions ===    
 
   public fun deposit(self: &mut Bank, account: &mut Account, token: Coin<SUI>, ctx: &mut TxContext) {
