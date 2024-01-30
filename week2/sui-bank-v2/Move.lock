@@ -2,12 +2,13 @@
 
 [move]
 version = 0
-manifest_digest = "0F7113F0B1C57DA70E35F67FFB2317AA3937E9C171D398546238BCD786653511"
-deps_digest = "3C4103934B1E040BB6B23F1D610B4EF9F2F1166A50A104EADCF77467C004C600"
+manifest_digest = "06C6810AC7E2108E82275051D92F30DEC9F1B9167473DB9ED9BE0728EEB9F1EF"
+deps_digest = "060AD7E57DFB13104F21BE5F5C3759D03F0553FC3229247D9A7A6B45F50D03A3"
 
 dependencies = [
   { name = "MoveStdlib" },
   { name = "Sui" },
+  { name = "SwitchboardStdLib" },
 ]
 
 [[move.package]]
@@ -20,6 +21,15 @@ source = { git = "https://github.com/MystenLabs/sui.git", rev = "framework/testn
 
 dependencies = [
   { name = "MoveStdlib" },
+]
+
+[[move.package]]
+name = "SwitchboardStdLib"
+source = { git = "https://github.com/switchboard-xyz/sbv2-sui.git", rev = "main", subdir = "move/testnet/switchboard_std/" }
+
+dependencies = [
+  { name = "MoveStdlib" },
+  { name = "Sui" },
 ]
 
 [move.toolchain-version]
