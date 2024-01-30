@@ -12,12 +12,16 @@ module sui_bank::lending {
 
   const EBorrowAmountIsTooHigh: u64 = 0;
 
+  // === Constants ===
+
+  const LTV: u128 = 40;  
+
   // === Public-Mutative Functions ===
 
   public fun borrow(account: &mut Account, cap: &mut CapWrapper, price: Price, value: u64, ctx: &mut TxContext): Coin<SUI_DOLLAR> {
     let (latest_result, scaling_factor, _) = oracle::destroy(price);
 
-    let max_borrow_amount = (((bank::account_balance(account) as u128) * latest_result / scaling_factor) as u64);
+    let max_borrow_amount = (((((bank::account_balance(account) as u128) * latest_result / scaling_factor) * LTV) / 100) as u64);
 
     let debt_mut = bank::debt_mut(account);
 

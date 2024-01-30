@@ -4,13 +4,9 @@ module sui_bank::oracle {
   use switchboard::aggregator::{Self, Aggregator};
   use switchboard::math;
 
-  // === Friends ===
-
   // === Errors ===
 
   const EPriceIsNegative: u64 = 0;
-
-  // === Constants ===
 
   // === Structs ===
 

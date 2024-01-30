@@ -102,7 +102,6 @@ module sui_bank::bank {
     balance::value(&self.admin_balance)
   }
 
-
   public fun debt(account: &Account): u64 {
     account.debt
   } 
