@@ -35,10 +35,6 @@
         "experimentalDecorators": true,                     /* Enables experimental support for decorators */
         "emitDecoratorMetadata": true                       /* Enables experimental support for emitting type metadata for decorators */
     },
-    "ts-node": {
-        "esm": true,
-        "experimentalSpecifierResolution": "node",
-    },
         "include": ["src/**/*"],
         "exclude": ["node_modules", "dist", "**/*.spec.ts"],
 }

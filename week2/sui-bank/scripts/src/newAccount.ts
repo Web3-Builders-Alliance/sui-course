@@ -1,30 +1,29 @@
 import { TransactionBlock } from '@mysten/sui.js/transactions';
-import { client, keypair, PACKAGE } from './config.js';
+import { client, keypair, getId } from './utils.js';
 
-const { execSync } = require('child_process');
+(async () => {
+	try {
+		const tx = new TransactionBlock();
 
-const { modules, dependencies } = JSON.parse(
-	execSync(`${process.env.CLI_PATH!} move build --dump-bytecode-as-base64 --path ${process.env.PACKAGE_PATH!}`, {
-		encoding: 'utf-8',
-	}),
-);
+		let [account] = tx.moveCall({
+			target: `${getId("package")}::bank::new_account`,
+			arguments: [],
+		});
 
-const tx = new TransactionBlock();
+		tx.transferObjects([account], keypair.getPublicKey().toSuiAddress());
 
-let [account] = tx.moveCall({
-	target: `${PACKAGE}::bank::new_account`,
-	arguments: [],
-});
+		const result = await client.signAndExecuteTransactionBlock({
+			signer: keypair,
+			transactionBlock: tx,
+			options: {
+				showObjectChanges: true,
+			},
+			requestType: "WaitForLocalExecution"
+		});
 
-tx.transferObjects([account], keypair.getPublicKey().toSuiAddress());
+		console.log("result: ", JSON.stringify(result, null, 2));
 
-const result = await client.signAndExecuteTransactionBlock({
-	signer: keypair,
-	transactionBlock: tx,
-	options: {
-		showEffects: true,
-	},
-	requestType: "WaitForLocalExecution"
-});
-
-console.log("result: ", JSON.stringify(result, null, 2));
+	} catch (e) {
+		console.log(e)
+	}
+})()
