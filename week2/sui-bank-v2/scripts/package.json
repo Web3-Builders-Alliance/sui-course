@@ -1,0 +1,20 @@
+{
+  "name": "sui-bank",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@typescript-eslint/parser": "^6.19.1",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "publish": "bun ./src/publish.ts",
+    "deposit_and_borrow": "bun ./src/deposit_and_borrow.ts"
+  },
+  "dependencies": {
+    "@mysten/sui.js": "^0.49.1",
+    "bun-types": "^1.0.25",
+    "csv": "^6.3.6",
+    "dotenv": "^16.4.1"
+  }
+}

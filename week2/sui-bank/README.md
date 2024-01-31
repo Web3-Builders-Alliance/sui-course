@@ -47,11 +47,11 @@ The Sui blockchain gives Sui rebates when objects are deleted as it frees up sto
 Write two swap functions with the signatures below:
 
 ```move
-  public fun swap_sui(cap: &mut CapWrapper,self: &mut Bank, acc: &mut Account,coin_in: Coin<SUI>, ctx: &mut TxContext): Coin<SUI_DOLLAR> {
+  public fun swap_sui(bank: &mut Bank, cap: &mut CapWrapper, coin_in: Coin<SUI>, ctx: &mut TxContext): Coin<SUI_DOLLAR> {
     abort(0)
   }
 
-  public fun swap_sui_dollar(cap: &mut CapWrapper,self: &mut Bank, acc: &mut Account, coin_in: Coin<SUI_DOLLAR>, ctx: &mut TxContext): Coin<SUI> {
+  public fun swap_sui_dollar(bank: &mut Bank, cap: &mut CapWrapper, coin_in: Coin<SUI_DOLLAR>, ctx: &mut TxContext): Coin<SUI> {
     abort(0)
   }
 ```
