@@ -19,6 +19,8 @@ Instead of hard coding an exchange rate we have added a module that uses Switchb
 
 ### Challenge
 
-- Write tests for the `amm` and `lending` modules.
-
-- add a whitelist to the `oracle` module that allows us to specify which switchboard `Aggrigators` we allow to provide us with oracle data.
+- make LTV and admin fee dynamic and set by the admin with value checks
+- improve oracle price assurance (timestamp and value guard)
+- whitelist oracle feeds
+- test all functions + including error cases
+- call all fns via PTBs
