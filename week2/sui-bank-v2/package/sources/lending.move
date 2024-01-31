@@ -5,7 +5,7 @@ module sui_bank::lending {
   use sui::tx_context::TxContext;
 
   use sui_bank::bank::{Self, Account};
-   use sui_bank::oracle::{Self, Price}; 
+  use sui_bank::oracle::{Self, Price}; 
   use sui_bank::sui_dollar::{Self, CapWrapper, SUI_DOLLAR}; 
 
   // === Errors ===
