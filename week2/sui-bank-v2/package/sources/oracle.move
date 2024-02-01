@@ -1,7 +1,7 @@
 module sui_bank::oracle {
   // === Imports ===
 
-  use sui::math;
+  use sui::math as sui_math;
 
   use switchboard::aggregator::{Self, Aggregator};
   use switchboard::math;
@@ -29,7 +29,7 @@ module sui_bank::oracle {
 
     Price {
       latest_result: value,
-      scaling_factor: (math::pow(10, scaling_factor) as u128),
+      scaling_factor: (sui_math::pow(10, scaling_factor) as u128),
       latest_timestamp
     }
   }
