@@ -86,11 +86,13 @@ module escrow::shared_escrow {
     option::fill(&mut self.item, item);
   }
 
-  public fun remove<T: store>(self: &mut Escrow<T>, cap: &Access<Sender>): T {
-    assert!(object::id(self) == cap.escrow, EUnauthorizedSender);
+  public fun remove<T: store>(self: Escrow<T>, cap: Access<Sender>): T {
+    assert!(object::id(&self) == cap.escrow, EUnauthorizedSender);
     assert!(!self.validated, ECannotRemoveItemAfterValidation);
 
-    option::extract(&mut self.item)
+    destroy_access(cap);
+
+    destroy_escrow_and_get_item(self)
   }
 
   public fun validate<T: store>(self: &mut Escrow<T>, cap: &Access<Agent>) {
@@ -100,17 +102,20 @@ module escrow::shared_escrow {
     self.validated = true;
   }    
 
-  public fun receive<T: store>(self: &mut Escrow<T>, cap: Access<Recipient>): T {
-    assert!(object::id(self) == cap.escrow, EUnauthorizedRecipient);
+  public fun receive<T: store>(self: Escrow<T>, cap: Access<Recipient>): T {
+    assert!(object::id(&self) == cap.escrow, EUnauthorizedRecipient);
     assert!(self.validated, ECannotReceiveInvalidEscrow);
 
     destroy_access(cap);
-    option::extract(&mut self.item)
+
+    destroy_escrow_and_get_item(self)
   }
 
-  public fun destroy_empty_escrow<T: store>(self: Escrow<T>, cap: &Access<Agent>) {
+  public fun destroy_empty_escrow<T: store>(self: Escrow<T>, cap: Access<Agent>) {
     assert!(option::is_none(&self.item), EEscrowMustBeEmpty);
     assert!(object::id(&self) == cap.escrow, EOnlyAgentCanDestroyAnEscrow);
+
+    destroy_access(cap);
 
     let Escrow { id, item, validated: _ } = self;
 
@@ -135,5 +140,19 @@ module escrow::shared_escrow {
 
   public fun escrow<T>(self: &Access<T>): ID {
     self.escrow
+  }
+
+
+  // === Private Functions ===
+  fun destroy_escrow_and_get_item<T: store>(self: Escrow<T>): T {
+    let Escrow { id, item, validated: _ } = self;
+
+    object::delete(id);
+    
+    let r = option::extract(&mut item);
+
+    option::destroy_none(item);
+
+    r
   }
 }
