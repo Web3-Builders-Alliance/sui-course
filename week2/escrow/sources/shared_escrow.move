@@ -18,8 +18,6 @@ module escrow::shared_escrow {
   const EEscrowMustBeEmpty: u64 = 6;
   const EOnlyAgentCanDestroyAnEscrow: u64 = 7;
 
-  // === Constants ===
-
   // === Structs ===
 
   struct Recipient {}
