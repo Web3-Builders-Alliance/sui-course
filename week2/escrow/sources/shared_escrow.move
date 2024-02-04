@@ -16,6 +16,7 @@ module escrow::shared_escrow {
   const EUnauthorizedRecipient: u64 = 4;
   const ECannotReceiveInvalidEscrow: u64 = 5;
   const EEscrowMustBeEmpty: u64 = 6;
+  const EOnlyAgentCanDestroyAnEscrow: u64 = 7;
 
   // === Constants ===
 
@@ -105,8 +106,9 @@ module escrow::shared_escrow {
     option::extract(&mut self.item)
   }
 
-  public fun destroy_empty_escrow<T: store>(self: Escrow<T>) {
+  public fun destroy_empty_escrow<T: store>(self: Escrow<T>, cap: &Access<Agent>) {
     assert!(option::is_none(&self.item), EEscrowMustBeEmpty);
+    assert!(object::id(cap) == self.agent, EOnlyAgentCanDestroyAnEscrow);
 
     let Escrow { id, sender: _, recipient: _, agent: _, item, validated: _ } = self;
 
