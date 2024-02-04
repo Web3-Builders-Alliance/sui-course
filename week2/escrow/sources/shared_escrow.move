@@ -1,4 +1,4 @@
-module escrow::escrow {
+module escrow::shared_escrow {
   // === Imports ===
 
   use std::option::{Self, Option};
@@ -6,8 +6,6 @@ module escrow::escrow {
   use sui::transfer;
   use sui::object::{Self, UID, ID};
   use sui::tx_context::{Self, TxContext};
-
-  // === Friends ===
 
   // === Errors ===
 
@@ -142,6 +140,4 @@ module escrow::escrow {
   public fun item<T:store>(self: &Escrow<T>): &Option<T> {
     &self.item
   }   
-
-  // === Test Functions ===  
 }
