@@ -5,6 +5,10 @@ module escrow::owned_escrow {
   use sui::object::{Self, UID};
   use sui::tx_context::{Self, TxContext};
 
+  // === Errors ===
+
+  const EAgentCannotDestroyTheItem: u64 = 0;
+
   // === Structs ===
 
   struct Escrow<T: store> has key {
@@ -38,8 +42,9 @@ module escrow::owned_escrow {
     transfer::transfer(self, sender);
   } 
 
-  public fun destroy<T: store>(self: Escrow<T>): T {
-    let Escrow { id, sender: _, recipient: _, item } = self;
+  public fun destroy<T: store>(self: Escrow<T>, ctx: &mut TxContext): T {
+    let Escrow { id, sender, recipient, item } = self;
+    assert!(sender == tx_context::sender(ctx) || recipient == tx_context::sender(ctx), EAgentCannotDestroyTheItem);
 
     object::delete(id);
 
