@@ -28,15 +28,13 @@ module escrow::shared_escrow {
 
   struct Agent {}
 
-  struct Access<phantom T> has key {
-    id: UID
+  struct Access<phantom T> has key, store {
+    id: UID,
+    escrow: ID
   }
 
   struct Escrow<T: store> has key {
     id: UID,
-    sender: ID,
-    recipient: ID,
-    agent: ID,
     validated: bool,
     item: Option<T>
   }  
@@ -44,33 +42,37 @@ module escrow::shared_escrow {
   // === Public-Mutative Functions ===
 
   public fun new<T: store>(ctx: &mut TxContext): (Access<Agent>, Access<Recipient>, Access<Sender>) {
+
+    let escrow = Escrow<T> {
+        id: object::new(ctx),
+        item: option::none(),
+        validated: false,
+      };
+
+    let escrow_id = object::id(&escrow);
+
+    transfer::share_object(escrow);
+
     let recipient = Access<Recipient> {
-      id: object::new(ctx)
+      id: object::new(ctx),
+      escrow: escrow_id
     };
 
 
     let sender = Access<Sender> {
-      id: object::new(ctx)
+      id: object::new(ctx),
+      escrow: escrow_id
     };
 
     let agent = Access<Agent> {
-      id: object::new(ctx)
-    };
-
-    transfer::share_object(
-      Escrow<T> {
-        id: object::new(ctx),
-        item: option::none(),
-        sender: object::id(&sender),
-        agent: object::id(&agent),
-        validated: false,
-        recipient: object::id(&recipient)
-      }
-    );
+      id: object::new(ctx),
+      escrow: escrow_id
+    };    
 
     (agent, recipient, sender)
   }  
 
+  #[lint_allow(self_transfer)]
   public fun new_and_transfer<T: store>(_sender: address, _recipient: address, ctx: &mut TxContext) {
     let (agent, recipient, sender) = new<T>(ctx);
     transfer::transfer(agent, tx_context::sender(ctx));
@@ -79,27 +81,27 @@ module escrow::shared_escrow {
   } 
 
   public fun add<T: store>(self: &mut Escrow<T>, cap: &Access<Sender>, item: T) {
-    assert!(object::id(cap) == self.sender, EUnauthorizedSender);
+    assert!(object::id(self) == cap.escrow, EUnauthorizedSender);
 
     option::fill(&mut self.item, item);
   }
 
   public fun remove<T: store>(self: &mut Escrow<T>, cap: &Access<Sender>): T {
-    assert!(object::id(cap) == self.sender, EUnauthorizedSender);
+    assert!(object::id(self) == cap.escrow, EUnauthorizedSender);
     assert!(!self.validated, ECannotRemoveItemAfterValidation);
 
     option::extract(&mut self.item)
   }
 
   public fun validate<T: store>(self: &mut Escrow<T>, cap: &Access<Agent>) {
-    assert!(object::id(cap) == self.agent, EUnauthorizedAgent);
+    assert!(object::id(self) == cap.escrow, EUnauthorizedAgent);
     assert!(option::is_some(&self.item), ECannotValidateAnEmptyEscrow);
 
     self.validated = true;
   }    
 
   public fun receive<T: store>(self: &mut Escrow<T>, cap: Access<Recipient>): T {
-    assert!(object::id(&cap) == self.recipient, EUnauthorizedRecipient);
+    assert!(object::id(self) == cap.escrow, EUnauthorizedRecipient);
     assert!(self.validated, ECannotReceiveInvalidEscrow);
 
     destroy_access(cap);
@@ -108,32 +110,20 @@ module escrow::shared_escrow {
 
   public fun destroy_empty_escrow<T: store>(self: Escrow<T>, cap: &Access<Agent>) {
     assert!(option::is_none(&self.item), EEscrowMustBeEmpty);
-    assert!(object::id(cap) == self.agent, EOnlyAgentCanDestroyAnEscrow);
+    assert!(object::id(&self) == cap.escrow, EOnlyAgentCanDestroyAnEscrow);
 
-    let Escrow { id, sender: _, recipient: _, agent: _, item, validated: _ } = self;
+    let Escrow { id, item, validated: _ } = self;
 
     option::destroy_none(item);
     object::delete(id);
   }
 
   public fun destroy_access<T>(cap: Access<T>) {
-    let Access { id } = cap;
+    let Access { id, escrow: _ } = cap;
     object::delete(id);  
   }
 
   // === Public-View Functions ===
-
-  public fun sender<T:store>(self: &Escrow<T>): ID {
-    self.sender
-  }
-
-  public fun recipient<T:store>(self: &Escrow<T>): ID {
-    self.recipient
-  }
-
-  public fun agent<T: store>(self: &Escrow<T>): ID {
-    self.agent
-  }  
 
   public fun validated<T:store>(self: &Escrow<T>): bool {
     self.validated
@@ -142,4 +132,8 @@ module escrow::shared_escrow {
   public fun item<T:store>(self: &Escrow<T>): &Option<T> {
     &self.item
   }   
+
+  public fun escrow<T>(self: &Access<T>): ID {
+    self.escrow
+  }
 }
