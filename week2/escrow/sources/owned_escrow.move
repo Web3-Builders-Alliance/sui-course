@@ -1,8 +1,8 @@
-module escrow::shared_escrow {
+module escrow::owned_escrow {
   // === Imports ===
   
   use sui::transfer;
-  use sui::object::{Self, UID, ID};
+  use sui::object::{Self, UID};
   use sui::tx_context::{Self, TxContext};
 
   // === Structs ===
