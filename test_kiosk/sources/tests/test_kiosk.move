@@ -15,25 +15,37 @@ module test_kiosk::test_kiosk {
   const OWNER: address = @0x2;
   const ALICE: address = @0x3;
   const BOB: address = @0x4;
+  const ARTIST: address = @0x5;
 
   struct NFT has key, store {
     id: UID
   }
 
-  // 1 - Place
-  // 2 - Take
-  // 3 - Lock 
-  // 4 - List
-  // 5 - Delist 
-  // 6 - List
-  // 7 - Buy
-  // 8 - Take Profits
+  // 1 - Define Policy
+  // 2 - Place
+  // 3 - Take
+  // 4 - Lock 
+  // 5 - List
+  // 6 - Delist 
+  // 7 - List
+  // 8 - Buy
+  // 9 - Take Profits
   #[test]
   fun test_case_one() {
 
     let scenario = ts::begin(@0x1);
 
     let scenario_mut = &mut scenario;
+
+    // Define Policy
+    next_tx(scenario_mut, ARTIST);
+    {
+      // Define a policy for an item
+      let (policy, policy_cap) = transfer_policy::new_for_testing<NFT>(ctx(scenario_mut));
+
+      transfer::public_share_object(policy);
+      transfer::public_transfer(policy_cap, ARTIST);
+    };
 
     // 1 - Create a Kiosk
     // 2 - Transfer the Kiosk Owner Cap to the Owner
