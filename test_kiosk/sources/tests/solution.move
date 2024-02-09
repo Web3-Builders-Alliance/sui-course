@@ -134,7 +134,7 @@ module test_kiosk::treasury {
     transfer_policy::add_receipt(TreasuryWitness {}, request);
   }
 
-  public fun read_config(config: &Config): u64 {
+  public fun amount(config: &Config): u64 {
     config.amount
   }
 }
