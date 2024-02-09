@@ -55,13 +55,8 @@ module test_kiosk::test_kiosk {
       // Create a Kiosk
       let (our_kiosk, cap) = kiosk::new(ctx(scenario_mut));
 
-      // Define a policy for an item
-      let (policy, policy_cap) = transfer_policy::new_for_testing<NFT>(ctx(scenario_mut));
-
-      transfer::public_share_object(policy);
       transfer::public_share_object(our_kiosk);
       transfer::public_transfer(cap, OWNER);
-      transfer::public_transfer(policy_cap, OWNER);
     };
 
     let nft = mint(ctx(scenario_mut));
